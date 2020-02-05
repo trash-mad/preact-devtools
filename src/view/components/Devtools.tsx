@@ -58,6 +58,8 @@ export function DevTools(props: { store: Store }) {
 							<a
 								class={s.bugLink}
 								href="https://github.com/preactjs/preact-devtools/issues"
+								target="_blank"
+								rel="noopener"
 							>
 								Report bug
 							</a>
