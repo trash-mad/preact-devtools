@@ -1,5 +1,6 @@
 import { Options, VNode } from "preact";
 import { Preact10Renderer } from "./renderer";
+import { addHookStack } from "./renderer/inspectVNode";
 
 export function setupOptions(options: Options, renderer: Preact10Renderer) {
 	const o = options as any;
@@ -10,6 +11,7 @@ export function setupOptions(options: Options, renderer: Preact10Renderer) {
 	let prevBeforeUnmount = options.unmount;
 	let prevBeforeDiff = o._diff || o.__b;
 	let prevAfterDiff = options.diffed;
+	let prevHook = (options as any)._hook || o.__h;
 
 	options.vnode = vnode => {
 		// Tiny performance improvement by initializing fields as doubles
@@ -51,6 +53,11 @@ export function setupOptions(options: Options, renderer: Preact10Renderer) {
 		renderer.onUnmount(vnode as any);
 	};
 
+	(options as any)._hook = o.__h = (currentComponent: any, type: number) => {
+		addHookStack(type);
+		if (prevHook) prevHook(currentComponent, type);
+	};
+
 	// Teardown devtools options. Mainly used for testing
 	return () => {
 		options.unmount = prevBeforeUnmount;
@@ -58,5 +65,6 @@ export function setupOptions(options: Options, renderer: Preact10Renderer) {
 		options.diffed = prevAfterDiff;
 		o._diff = o.__b = prevBeforeDiff;
 		options.vnode = prevVNodeHook;
+		(options as any)._hook = o.__h;
 	};
 }
