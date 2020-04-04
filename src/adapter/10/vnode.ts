@@ -60,6 +60,18 @@ export function getComponentHooks(c: Component) {
 	return (c as any).__hooks || (c as any).__H || null;
 }
 
+export function getHookState(c: Component, index: number) {
+	const hooks = getComponentHooks(c);
+	if (hooks) {
+		const list = hooks._list || hooks.__;
+		if (list && list[index]) {
+			return list[index]._value || list[index].__;
+		}
+	}
+
+	return [];
+}
+
 /**
  * Get teh diffed children of a `vnode`
  */
